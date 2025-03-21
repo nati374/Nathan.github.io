@@ -1,133 +1,104 @@
-const canvas = document.getElementById("simulationCanvas");
-const ctx = canvas.getContext("2d");
-canvas.width = 800;
-canvas.height = 400;
+const textInput = document.getElementById("text-input");
+const voiceSelect = document.getElementById("voice-select");
+const speedInput = document.getElementById("speed");
+const pitchInput = document.getElementById("pitch");
+const speedValue = document.getElementById("speed-value");
+const pitchValue = document.getElementById("pitch-value");
+const speakBtn = document.getElementById("speak-btn");
+const pauseBtn = document.getElementById("pause-btn");
+const resumeBtn = document.getElementById("resume-btn");
+const stopBtn = document.getElementById("stop-btn");
+const downloadBtn = document.getElementById("download-btn");
+const themeToggle = document.getElementById("theme-toggle");
+const charCount = document.getElementById("char-count");
 
-const velocityInput = document.getElementById("velocity");
-const angleInput = document.getElementById("angle");
-const gravityInput = document.getElementById("gravity");
-const airResistanceInput = document.getElementById("airResistance");
-const startButton = document.getElementById("start");
-const clearButton = document.getElementById("clear");
+let voices = [];
+let utterance = new SpeechSynthesisUtterance();
 
-let projectiles = [];
-let graphData = {
-    labels: [],
-    datasets: [{
-        label: 'Height over Time',
-        data: [],
-        borderColor: 'rgba(75, 192, 192, 1)',
-        fill: false,
-    }]
-};
-
-const graphCanvas = document.getElementById("graphCanvas");
-const graphCtx = graphCanvas.getContext("2d");
-let chart = new Chart(graphCtx, {
-    type: 'line',
-    data: graphData,
-    options: {
-        responsive: true,
-        scales: {
-            x: {
-                title: {
-                    display: true,
-                    text: 'Time (s)'
-                }
-            },
-            y: {
-                title: {
-                    display: true,
-                    text: 'Height (m)'
-                }
-            }
-        }
-    }
-});
-
-class Projectile {
-    constructor(v, angle, g, airResistance) {
-        this.x = 50;
-        this.y = canvas.height - 50;
-        this.vx = v * Math.cos(angle * Math.PI / 180);
-        this.vy = -v * Math.sin(angle * Math.PI / 180);
-        this.g = g;
-        this.airResistance = airResistance;
-        this.time = 0;
-        this.trail = [];
-    }
-
-    update() {
-        this.x += this.vx * 0.1;
-        this.y += this.vy * 0.1;
-        this.vy += this.g * 0.1;
-
-        // Air resistance: reduces velocity
-        const resistanceX = this.airResistance * this.vx;
-        const resistanceY = this.airResistance * this.vy;
-        this.vx -= resistanceX;
-        this.vy -= resistanceY;
-
-        // Store trajectory for graph
-        if (this.time % 1 === 0) {
-            this.trail.push({ time: this.time, height: this.y });
-            if (this.trail.length > 20) this.trail.shift();
-        }
-
-        this.time += 0.1;
-    }
-
-    draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, 5, 0, Math.PI * 2);
-        ctx.fillStyle = "red";
-        ctx.fill();
-        ctx.closePath();
-
-        // Draw projectile trail
-        this.trail.forEach((point, index) => {
-            ctx.beginPath();
-            ctx.arc(point.time * 10, point.height, 2, 0, Math.PI * 2);
-            ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-            ctx.fill();
-            ctx.closePath();
-        });
-    }
-}
-
-function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    projectiles.forEach((p, index) => {
-        p.update();
-        p.draw();
-        if (p.y > canvas.height - 50) {
-            projectiles.splice(index, 1);
-        }
+// Load voices
+function loadVoices() {
+    voices = speechSynthesis.getVoices();
+    voiceSelect.innerHTML = "";
+    
+    voices.forEach((voice, index) => {
+        const option = document.createElement("option");
+        option.value = index;
+        option.textContent = `${voice.name} (${voice.lang})`;
+        voiceSelect.appendChild(option);
     });
-
-    // Update Graph
-    graphData.labels = projectiles[0] ? projectiles[0].trail.map(p => p.time) : [];
-    graphData.datasets[0].data = projectiles[0] ? projectiles[0].trail.map(p => p.height) : [];
-    chart.update();
-
-    requestAnimationFrame(animate);
 }
 
-startButton.addEventListener("click", () => {
-    const v = parseFloat(velocityInput.value);
-    const angle = parseFloat(angleInput.value);
-    const g = parseFloat(gravityInput.value);
-    const airResistance = parseFloat(airResistanceInput.value);
+window.speechSynthesis.onvoiceschanged = loadVoices;
 
-    projectiles.push(new Projectile(v, angle, g, airResistance));
+// Speak text
+function speakText() {
+    if (!textInput.value.trim()) return;
+    
+    utterance.text = textInput.value;
+    utterance.voice = voices[voiceSelect.value];
+    utterance.rate = parseFloat(speedInput.value);
+    utterance.pitch = parseFloat(pitchInput.value);
+    
+    speechSynthesis.speak(utterance);
+}
 
-    if (projectiles.length === 1) animate();
+// Pause speech
+function pauseSpeech() {
+    speechSynthesis.pause();
+}
+
+// Resume speech
+function resumeSpeech() {
+    speechSynthesis.resume();
+}
+
+// Stop speech
+function stopSpeech() {
+    speechSynthesis.cancel();
+}
+
+// Download speech as MP3
+function downloadSpeech() {
+    const text = textInput.value.trim();
+    if (!text) return;
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voice = voices[voiceSelect.value];
+
+    if (voice) utterance.voice = voice;
+    utterance.rate = parseFloat(speedInput.value);
+    utterance.pitch = parseFloat(pitchInput.value);
+
+    const audio = new Audio();
+    audio.src = `https://api.voicerss.org/?key=25bff35e166e47be9533e69a7a6c547a=en-us&src=${encodeURIComponent(text)}`;
+    audio.play();
+}
+
+// Auto-save text
+textInput.addEventListener("input", () => {
+    localStorage.setItem("savedText", textInput.value);
+    charCount.textContent = `Characters: ${textInput.value.length}`;
 });
 
-clearButton.addEventListener("click", () => {
-    projectiles = [];
-    graphData.labels = [];
-    graphData.datasets[0].data = [];
-    chart.update();
+// Load saved text
+window.addEventListener("load", () => {
+    textInput.value = localStorage.getItem("savedText") || "";
+    charCount.textContent = `Characters: ${textInput.value.length}`;
 });
+
+// Update speed and pitch display
+speedInput.addEventListener("input", () => speedValue.textContent = `${speedInput.value}x`);
+pitchInput.addEventListener("input", () => pitchValue.textContent = `${pitchInput.value}x`);
+
+// Dark/Light Mode Toggle
+themeToggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark-mode");
+    themeToggle.textContent = document.body.classList.contains("dark-mode") ? "☀ Light Mode" : "🌙 Dark Mode";
+});
+
+// Button Listeners
+speakBtn.addEventListener("click", speakText);
+pauseBtn.addEventListener("click", pauseSpeech);
+resumeBtn.addEventListener("click", resumeSpeech);
+stopBtn.addEventListener("click", stopSpeech);
+downloadBtn.addEventListener("click", downloadSpeech);

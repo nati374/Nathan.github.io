@@ -3,45 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="manifest" href="manifest.json">
-    <title>Voice Assistant</title>
+    <title>Large Candle Flame and Spark</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f4f4f4;
-            padding: 20px;
-            transition: background 0.5s ease-in-out;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
-        h1 {
-            color: #333;
+
+        .candle {
+            position: relative;
+            width: 40px; /* Increased width */
+            height: 200px; /* Increased height */
+            background-color: #fff;
+            border-radius: 20px 20px 0 0; /* Adjusted border-radius */
         }
-        button {
-            background: blue;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 20px;
+
+        .flame {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px; /* Increased width */
+            height: 80px; /* Increased height */
+            background-color: #ff5722;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            animation: flicker 1.5s infinite alternate;
         }
-        button:hover {
-            background: red;
+
+        .spark {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px; /* Increased width */
+            height: 20px; /* Increased height */
+            background-color: #ffeb3b;
+            opacity: 0;
+            animation: spark 1.5s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 100% {
+                transform: translateX(-50%) scale(1);
+                background-color: #ff5722;
+            }
+            50% {
+                transform: translateX(-50%) scale(1.1);
+                background-color: #ff9800;
+            }
+        }
+
+        @keyframes spark {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(-40px); /* Adjusted distance */
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-80px); /* Adjusted distance */
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Voice Assistant</h1>
-    <p id="status">Click the button and speak a command.</p>
-    <button onclick="startListening()">Start Listening</button>
-    
-    <script src="script.js"></script>
-    <script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js").then(() => {
-      console.log("Service Worker Registered");
-    });
-  }
-</script>
+    <div class="candle">
+        <div class="flame"></div>
+        <div class="spark"></div>
+    </div>
 </body>
 </html>
