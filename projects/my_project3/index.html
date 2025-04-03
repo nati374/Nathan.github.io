@@ -1,145 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Interactive 3D Solar System</title>
-  <style>
-    /* General Reset */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      background: #000;
-      color: #fff;
-      font-family: 'Arial', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    /* Solar System Container */
-    .solar-system {
-      position: relative;
-      width: 300px;
-      height: 300px;
-      transform-style: preserve-3d;
-      animation: rotate 30s linear infinite;
-    }
-
-    /* Sun */
-    .sun {
-      position: absolute;
-      width: 80px;
-      height: 80px;
-      background: radial-gradient(circle, #ffcc00, #ff6600);
-      border-radius: 50%;
-      box-shadow: 0 0 50px #ff6600;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    /* Planets */
-    .planet {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: #ccc;
-      transform-origin: 150px 150px;
-      animation: orbit 10s linear infinite;
-    }
-
-    .planet:hover {
-      transform: scale(1.5);
-      cursor: pointer;
-    }
-
-    /* Planet Colors and Sizes */
-    .mercury { background: #a9a9a9; animation-duration: 5s; }
-    .venus { background: #ffcc99; animation-duration: 8s; }
-    .earth { background: #6699cc; animation-duration: 12s; }
-    .mars { background: #cc6666; animation-duration: 15s; }
-    .jupiter { background: #cc9966; animation-duration: 20s; width: 40px; height: 40px; }
-    .saturn { background: #ffcc66; animation-duration: 25s; width: 35px; height: 35px; }
-    .uranus { background: #66ccff; animation-duration: 30s; }
-    .neptune { background: #6666cc; animation-duration: 35s; }
-
-    /* Planet Orbits */
-    .mercury { transform: rotate(0deg) translateX(50px); }
-    .venus { transform: rotate(45deg) translateX(80px); }
-    .earth { transform: rotate(90deg) translateX(120px); }
-    .mars { transform: rotate(135deg) translateX(150px); }
-    .jupiter { transform: rotate(180deg) translateX(200px); }
-    .saturn { transform: rotate(225deg) translateX(230px); }
-    .uranus { transform: rotate(270deg) translateX(260px); }
-    .neptune { transform: rotate(315deg) translateX(290px); }
-
-    /* Animations */
-    @keyframes rotate {
-      0% { transform: rotateY(0deg); }
-      100% { transform: rotateY(360deg); }
-    }
-
-    @keyframes orbit {
-      0% { transform: rotate(0deg) translateX(150px) rotate(0deg); }
-      100% { transform: rotate(360deg) translateX(150px) rotate(360deg); }
-    }
-
-    /* Planet Details (Hidden by Default) */
-    .planet-details {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.8);
-      padding: 10px;
-      border-radius: 5px;
-      display: none;
-      font-size: 14px;
-    }
-
-    .planet:hover .planet-details {
-      display: block;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Product Visualization</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        #container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            background-color: rgba(0,0,0,0.5);
+            padding: 5px;
+            z-index: 100;
+        }
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background-color: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
+            z-index: 100;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-  <div class="solar-system">
-    <!-- Sun -->
-    <div class="sun"></div>
+    <div id="container"></div>
+    <div id="info">3D Product Visualization - Premium Water Bottle</div>
+    <div id="controls">
+        <button id="rotateBtn">Toggle Rotation</button>
+        <button id="wireframeBtn">Toggle Wireframe</button>
+        <button id="changeColorBtn">Change Color</button>
+    </div>
 
-    <!-- Planets -->
-    <div class="planet mercury">
-      <div class="planet-details">Mercury: Closest to the Sun</div>
-    </div>
-    <div class="planet venus">
-      <div class="planet-details">Venus: Hottest Planet</div>
-    </div>
-    <div class="planet earth">
-      <div class="planet-details">Earth: Our Home</div>
-    </div>
-    <div class="planet mars">
-      <div class="planet-details">Mars: The Red Planet</div>
-    </div>
-    <div class="planet jupiter">
-      <div class="planet-details">Jupiter: The Giant</div>
-    </div>
-    <div class="planet saturn">
-      <div class="planet-details">Saturn: Ringed Beauty</div>
-    </div>
-    <div class="planet uranus">
-      <div class="planet-details">Uranus: The Ice Giant</div>
-    </div>
-    <div class="planet neptune">
-      <div class="planet-details">Neptune: The Blue Planet</div>
-    </div>
-  </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+    <script>
+        // Scene setup
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xf0f0f0);
+        
+        // Camera setup
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+        
+        // Renderer setup
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.getElementById('container').appendChild(renderer.domElement);
+        
+        // Orbit controls
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(1, 1, 1);
+        scene.add(directionalLight);
+        
+        const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
+        directionalLight2.position.set(-1, -1, -1);
+        scene.add(directionalLight2);
+        
+        // Product geometry - a bottle shape
+        const createBottle = (color) => {
+            const group = new THREE.Group();
+            
+            // Bottle body (main cylinder)
+            const bodyGeometry = new THREE.CylinderGeometry(0.8, 0.6, 2, 32);
+            const bodyMaterial = new THREE.MeshPhongMaterial({ 
+                color: color,
+                transparent: true,
+                opacity: 0.9,
+                shininess: 100
+            });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            body.position.y = 0;
+            group.add(body);
+            
+            // Bottle neck
+            const neckGeometry = new THREE.CylinderGeometry(0.3, 0.4, 0.5, 32);
+            const neck = new THREE.Mesh(neckGeometry, bodyMaterial);
+            neck.position.y = 1.25;
+            group.add(neck);
+            
+            // Bottle cap
+            const capGeometry = new THREE.CylinderGeometry(0.32, 0.32, 0.2, 32);
+            const capMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x333333,
+                shininess: 30
+            });
+            const cap = new THREE.Mesh(capGeometry, capMaterial);
+            cap.position.y = 1.5;
+            group.add(cap);
+            
+            // Water inside
+            const waterGeometry = new THREE.CylinderGeometry(0.78, 0.58, 1.8, 32);
+            const waterMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x3399ff,
+                transparent: true,
+                opacity: 0.7,
+                shininess: 100
+            });
+            const water = new THREE.Mesh(waterGeometry, waterMaterial);
+            water.position.y = -0.1;
+            group.add(water);
+            
+            return group;
+        };
+        
+        // Create initial bottle
+        const bottleColors = [0x00a86b, 0xff6b6b, 0x4b0082, 0xffa500];
+        let currentColorIndex = 0;
+        let bottle = createBottle(bottleColors[currentColorIndex]);
+        scene.add(bottle);
+        
+        // Add floor
+        const floorGeometry = new THREE.PlaneGeometry(10, 10);
+        const floorMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0xdddddd,
+            roughness: 0.1,
+            metalness: 0.0
+        });
+        const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+        floor.rotation.x = -Math.PI / 2;
+        floor.position.y = -1.2;
+        scene.add(floor);
+        
+        // Add subtle grid helper
+        const gridHelper = new THREE.GridHelper(10, 10, 0x888888, 0xcccccc);
+        scene.add(gridHelper);
+        
+        // Animation variables
+        let autoRotate = true;
+        let wireframeMode = false;
+        
+        // Controls functionality
+        document.getElementById('rotateBtn').addEventListener('click', () => {
+            autoRotate = !autoRotate;
+        });
+        
+        document.getElementById('wireframeBtn').addEventListener('click', () => {
+            wireframeMode = !wireframeMode;
+            bottle.traverse((child) => {
+                if (child.isMesh && child.material) {
+                    child.material.wireframe = wireframeMode;
+                }
+            });
+        });
+        
+        document.getElementById('changeColorBtn').addEventListener('click', () => {
+            currentColorIndex = (currentColorIndex + 1) % bottleColors.length;
+            scene.remove(bottle);
+            bottle = createBottle(bottleColors[currentColorIndex]);
+            if (wireframeMode) {
+                bottle.traverse((child) => {
+                    if (child.isMesh && child.material) {
+                        child.material.wireframe = true;
+                    }
+                });
+            }
+            scene.add(bottle);
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (autoRotate) {
+                bottle.rotation.y += 0.005;
+            }
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        
+        animate();
+    </script>
 </body>
 </html>
